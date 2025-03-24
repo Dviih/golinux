@@ -3,6 +3,7 @@ package config
 import (
 	"gopkg.in/yaml.v3"
 	"io/fs"
+	"os"
 )
 
 type KV struct {
