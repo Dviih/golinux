@@ -36,6 +36,13 @@ func (kvs *KVS) UnmarshalYAML(value *yaml.Node) error {
 type Config struct {
 	file fs.File `yaml:"-"`
 
+func FromPath(path string) (*Config, error) {
+	file, err := os.OpenFile(path, os.O_RDWR, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return FromFile(file)
 }
 
 func FromFile(file fs.File) (*Config, error) {
