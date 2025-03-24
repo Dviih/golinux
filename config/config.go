@@ -2,6 +2,7 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
+	"io/fs"
 )
 
 type KV struct {
@@ -30,5 +31,10 @@ func (kvs *KVS) UnmarshalYAML(value *yaml.Node) error {
 	}
 
 	return nil
+}
+
+type Config struct {
+	file fs.File `yaml:"-"`
+
 }
 
