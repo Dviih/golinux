@@ -38,3 +38,20 @@ type Config struct {
 
 }
 
+func FromFile(file fs.File) (*Config, error) {
+	config := &Config{file: file}
+
+	if err := yaml.NewDecoder(file).Decode(&config); err != nil {
+		return nil, err
+	}
+
+
+	go func() {
+		return
+		if err := config.update(); err != nil {
+			panic(err)
+		}
+	}()
+
+	return config, nil
+}
