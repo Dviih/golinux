@@ -90,9 +90,8 @@ func FromFile(file fs.File) (*Config, error) {
 	}
 
 	go func() {
-		return
 		if err := config.update(); err != nil {
-			panic(err)
+			println("failed to load update config:", err.Error())
 		}
 	}()
 
