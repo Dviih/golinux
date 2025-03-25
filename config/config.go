@@ -41,6 +41,26 @@ func (kv *KV) MarshalYAML() (interface{}, error) {
 type Config struct {
 	file fs.File `yaml:"-"`
 
+}
+
+func (config *Config) Sync() error {
+	seeker, ok := config.file.(io.Seeker)
+	if !ok {
+		return errors.New("unsupported: missing io.Seeker")
+	}
+
+	if _, err := seeker.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	writer, ok := config.file.(io.Writer)
+	if !ok {
+		return errors.New("unsupported: missing io.Writer")
+	}
+
+	return yaml.NewEncoder(writer).Encode(config)
+}
+
 func FromPath(path string) (*Config, error) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
