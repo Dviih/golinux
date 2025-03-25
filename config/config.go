@@ -34,6 +34,10 @@ func (kvs *KVS) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (kv *KV) MarshalYAML() (interface{}, error) {
+	return map[string]string{kv.Key: kv.Value}, nil
+}
+
 type Config struct {
 	file fs.File `yaml:"-"`
 
