@@ -85,6 +85,9 @@ func FromFile(file fs.File) (*Config, error) {
 		return nil, err
 	}
 
+	if err := config.Sync(); err != nil {
+		return nil, err
+	}
 
 	go func() {
 		return
