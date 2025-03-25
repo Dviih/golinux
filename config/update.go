@@ -14,4 +14,9 @@ func (config *Config) update() error {
 		return errors.New("unsupported: io.Reader")
 	}
 
+	seeker, ok := config.file.(io.Seeker)
+	if !ok {
+		return errors.New("unsupported: io.Seeker")
+	}
+
 }
