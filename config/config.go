@@ -61,6 +61,13 @@ func (config *Config) Sync() error {
 	return yaml.NewEncoder(writer).Encode(config)
 }
 
+func (config *Config) Close() error {
+	err := config.file.Close()
+	*config = Config{}
+
+	return err
+}
+
 func FromPath(path string) (*Config, error) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
