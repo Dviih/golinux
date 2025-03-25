@@ -8,3 +8,5 @@ import (
 	"io"
 )
 
+func (config *Config) update() error {
+}
