@@ -2,6 +2,7 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
+	"io"
 	"io/fs"
 	"os"
 )
