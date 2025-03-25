@@ -9,4 +9,9 @@ import (
 )
 
 func (config *Config) update() error {
+	reader, ok := config.file.(io.Reader)
+	if !ok {
+		return errors.New("unsupported: io.Reader")
+	}
+
 }
