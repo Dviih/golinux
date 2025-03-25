@@ -19,4 +19,18 @@ func (config *Config) update() error {
 		return errors.New("unsupported: io.Seeker")
 	}
 
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		return err
+	}
+
+	stat, err := config.file.Stat()
+	if err != nil {
+		return err
+	}
+
+	if err = watcher.Add(util.WD(stat.Name())); err != nil {
+		return err
+	}
+
 }
