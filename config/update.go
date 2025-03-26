@@ -33,4 +33,22 @@ func (config *Config) update() error {
 		return err
 	}
 
+	for {
+		select {
+		case event := <-watcher.Events:
+			if event.Op != fsnotify.Write {
+				continue
+			}
+
+			if _, err = seeker.Seek(0, io.SeekStart); err != nil {
+				return err
+			}
+
+			if err = yaml.NewDecoder(reader).Decode(&config); err != nil {
+				return err
+			}
+		case err = <-watcher.Errors:
+			return err
+		}
+	}
 }
