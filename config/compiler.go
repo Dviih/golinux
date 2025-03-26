@@ -30,3 +30,18 @@ func (compiler *Compiler) GetEnvironment() []string {
 	return env
 }
 
+func (compiler *Compiler) GetArgs() []string {
+	arguments := strings.Split(compiler.Call, " ")[1:]
+
+	for _, argument := range compiler.Arguments {
+		if argument.Value == "" {
+			arguments = append(arguments, "-"+argument.Key)
+			continue
+		}
+
+		arguments = append(arguments, "-"+argument.Key, argument.Value)
+	}
+
+	return arguments
+}
+
