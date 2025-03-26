@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"github.com/Dviih/golinux/util"
 	"gopkg.in/yaml.v3"
 	"io"
 	"io/fs"
