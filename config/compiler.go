@@ -70,3 +70,17 @@ func (compiler *Compiler) Compile(writer io.Writer, target string) error {
 	return nil
 }
 
+func (compiler *Compiler) compile(stdin io.Reader, stdout, stderr io.Writer, target string) error {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	args := compiler.GetArgs()
+
+	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+
+	cmd.Env = compiler.GetEnvironment()
+	cmd.Dir = target
+	cmd.Stdin = stdin
+	cmd.Stderr = stderr
+	cmd.Stdout = stdout
+
+}
