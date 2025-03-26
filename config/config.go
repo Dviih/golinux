@@ -44,6 +44,8 @@ func (kv *KV) MarshalYAML() (interface{}, error) {
 type Config struct {
 	file fs.File `yaml:"-"`
 
+	Project   string               `yaml:"project"`
+	Compilers map[string]*Compiler `yaml:"compilers"`
 }
 
 func (config *Config) Sync() error {
@@ -69,6 +71,18 @@ func (config *Config) Close() error {
 	*config = Config{}
 
 	return err
+}
+
+func (config *Config) Compiler(name string) *Compiler {
+	compiler, ok := config.Compilers[name]
+	if !ok {
+		return &Compiler{name: name}
+	}
+
+	compiler.name = name
+	compiler.project = config.Project
+
+	return compiler
 }
 
 func FromPath(path string) (*Config, error) {
