@@ -20,3 +20,13 @@ type Compiler struct {
 	Arguments   KVS               `yaml:"arguments"`
 }
 
+func (compiler *Compiler) GetEnvironment() []string {
+	env := os.Environ()
+
+	for k, v := range compiler.Environment {
+		env = append(env, k+"="+v)
+	}
+
+	return env
+}
+
