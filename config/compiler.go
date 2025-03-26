@@ -11,3 +11,12 @@ import (
 	"strings"
 )
 
+type Compiler struct {
+	name    string `yaml:"-"`
+	project string `yaml:"-"`
+
+	Call        string            `yaml:"call"`
+	Environment map[string]string `yaml:"environment"`
+	Arguments   KVS               `yaml:"arguments"`
+}
+
