@@ -49,3 +49,24 @@ func (compiler *Compiler) Name() string {
 	return compiler.name
 }
 
+func (compiler *Compiler) Compile(writer io.Writer, target string) error {
+	if writer == nil {
+		writer = os.Stdout
+	}
+
+	stderr := &util.Writer{}
+
+	switch target[0] {
+	case '/':
+		break
+	default:
+		target = path.Join(util.WD(), target)
+	}
+
+	if err := compiler.compile(nil, writer, stderr, target); err != nil {
+		return stderr.Error(err)
+	}
+
+	return nil
+}
+
