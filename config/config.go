@@ -44,6 +44,7 @@ func (kv *KV) MarshalYAML() (interface{}, error) {
 type Config struct {
 	file fs.File `yaml:"-"`
 
+	Project   string               `yaml:"project"`
 }
 
 func (config *Config) Sync() error {
