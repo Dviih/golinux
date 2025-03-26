@@ -1,7 +1,10 @@
 package config
 
 import (
+	"errors"
+	"github.com/Dviih/golinux/util"
 	"gopkg.in/yaml.v3"
+	"io"
 	"io/fs"
 	"os"
 )
@@ -34,8 +37,39 @@ func (kvs *KVS) UnmarshalYAML(value *yaml.Node) error {
 	return nil
 }
 
+func (kv *KV) MarshalYAML() (interface{}, error) {
+	return map[string]string{kv.Key: kv.Value}, nil
+}
+
 type Config struct {
 	file fs.File `yaml:"-"`
+
+}
+
+func (config *Config) Sync() error {
+	seeker, ok := config.file.(io.Seeker)
+	if !ok {
+		return errors.New("unsupported: missing io.Seeker")
+	}
+
+	if _, err := seeker.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	writer, ok := config.file.(io.Writer)
+	if !ok {
+		return errors.New("unsupported: missing io.Writer")
+	}
+
+	return yaml.NewEncoder(writer).Encode(config)
+}
+
+func (config *Config) Close() error {
+	err := config.file.Close()
+	*config = Config{}
+
+	return err
+}
 
 func FromPath(path string) (*Config, error) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
@@ -53,11 +87,13 @@ func FromFile(file fs.File) (*Config, error) {
 		return nil, err
 	}
 
+	if err := config.Sync(); err != nil {
+		return nil, err
+	}
 
 	go func() {
-		return
 		if err := config.update(); err != nil {
-			panic(err)
+			println("failed to load update config:", err.Error())
 		}
 	}()
 
