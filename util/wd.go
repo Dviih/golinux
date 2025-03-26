@@ -45,3 +45,19 @@ func WDKernel(project string, paths ...interface{}) string {
 	return WDProject(project, "kernel", paths)
 }
 
+func wdAppend(v ...interface{}) []string {
+	var ret []string
+
+	for _, v := range v {
+		switch v := v.(type) {
+		case string:
+			ret = append(ret, v)
+		case []string:
+			ret = append(ret, v...)
+		default:
+			panic("wdAppend: invalid input")
+		}
+	}
+
+	return ret
+}
