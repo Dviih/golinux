@@ -37,3 +37,7 @@ func WDProject(project string, paths ...interface{}) string {
 	return WD(".golinux", project, paths)
 }
 
+func WDInitramfs(project string, paths ...interface{}) string {
+	return WDProject(project, "initramfs", paths)
+}
+
