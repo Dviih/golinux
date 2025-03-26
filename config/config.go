@@ -45,6 +45,7 @@ type Config struct {
 	file fs.File `yaml:"-"`
 
 	Project   string               `yaml:"project"`
+	Compilers map[string]*Compiler `yaml:"compilers"`
 }
 
 func (config *Config) Sync() error {
