@@ -83,4 +83,29 @@ func (compiler *Compiler) compile(stdin io.Reader, stdout, stderr io.Writer, tar
 	cmd.Stderr = stderr
 	cmd.Stdout = stdout
 
+	if err := cmd.Start(); err != nil {
+		cancel()
+		return err
+	}
+
+	if cmd.Err != nil {
+		cancel()
+		return cmd.Err
+	}
+
+	if err := cmd.Wait(); err != nil {
+		cancel()
+		return err
+	}
+
+	cancel()
+
+	select {
+	case <-ctx.Done():
+		if errors.Is(ctx.Err(), context.Canceled) {
+			return nil
+		}
+
+		return ctx.Err()
+	}
 }
