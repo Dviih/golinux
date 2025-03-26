@@ -72,6 +72,18 @@ func (config *Config) Close() error {
 	return err
 }
 
+func (config *Config) Compiler(name string) *Compiler {
+	compiler, ok := config.Compilers[name]
+	if !ok {
+		return &Compiler{name: name}
+	}
+
+	compiler.name = name
+	compiler.project = config.Project
+
+	return compiler
+}
+
 func FromPath(path string) (*Config, error) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
