@@ -41,3 +41,7 @@ func WDInitramfs(project string, paths ...interface{}) string {
 	return WDProject(project, "initramfs", paths)
 }
 
+func WDKernel(project string, paths ...interface{}) string {
+	return WDProject(project, "kernel", paths)
+}
+
