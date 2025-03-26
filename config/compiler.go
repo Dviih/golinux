@@ -45,3 +45,7 @@ func (compiler *Compiler) GetArgs() []string {
 	return arguments
 }
 
+func (compiler *Compiler) Name() string {
+	return compiler.name
+}
+
