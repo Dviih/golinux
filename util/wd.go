@@ -33,3 +33,7 @@ func SetWD(s string) {
 	wd = path.Join(wd, s)
 }
 
+func WDProject(project string, paths ...interface{}) string {
+	return WD(".golinux", project, paths)
+}
+
