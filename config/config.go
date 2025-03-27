@@ -46,6 +46,7 @@ type Config struct {
 
 	Project   string               `yaml:"project"`
 	Compilers map[string]*Compiler `yaml:"compilers"`
+	Kernels   map[string]*Kernel   `yaml:"kernel"`
 }
 
 func (config *Config) Sync() error {
