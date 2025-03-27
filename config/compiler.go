@@ -49,7 +49,7 @@ func (compiler *Compiler) Name() string {
 	return compiler.name
 }
 
-func (compiler *Compiler) Compile(writer io.Writer, target string) error {
+func (compiler *Compiler) Compile(ctx context.Context, writer io.Writer, target string) error {
 	if writer == nil {
 		writer = os.Stdout
 	}
@@ -63,7 +63,7 @@ func (compiler *Compiler) Compile(writer io.Writer, target string) error {
 		target = path.Join(util.WD(), target)
 	}
 
-	if err := compiler.compile(nil, writer, stderr, target); err != nil {
+	if err := compiler.compile(ctx, nil, writer, stderr, target); err != nil {
 		return stderr.Error(err)
 	}
 
@@ -72,6 +72,8 @@ func (compiler *Compiler) Compile(writer io.Writer, target string) error {
 
 func (compiler *Compiler) compile(stdin io.Reader, stdout, stderr io.Writer, target string) error {
 	ctx, cancel := context.WithCancel(context.Background())
+func (compiler *Compiler) compile(ctx context.Context, stdin io.Reader, stdout, stderr io.Writer, target string) error {
+	ctx, cancel := context.WithCancel(ctx)
 
 	args := compiler.GetArgs()
 
