@@ -37,3 +37,6 @@ func (kernel *Kernel) Menu(ctx context.Context) error {
 	return nil
 }
 
+func (kernel *Kernel) Build(ctx context.Context, writer io.Writer) error {
+	return kernel.compiler.Compile(ctx, writer, kernel.Path)
+}
