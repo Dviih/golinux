@@ -86,6 +86,19 @@ func (config *Config) Compiler(name string) *Compiler {
 	return compiler
 }
 
+func (config *Config) Kernel(name string) *Kernel {
+	kernel, ok := config.Kernels[name]
+	if !ok {
+		return &Kernel{name: name}
+	}
+
+	kernel.name = name
+	kernel.compiler = config.Compiler(kernel.Compiler)
+	kernel.Path = util.WDKernel(config.Project)
+
+	return kernel
+}
+
 func FromPath(path string) (*Config, error) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
