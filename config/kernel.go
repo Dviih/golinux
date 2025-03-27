@@ -17,3 +17,7 @@ type Kernel struct {
 	Compiler string `yaml:"compiler"`
 }
 
+func (kernel *Kernel) Name() string {
+	return kernel.name
+}
+
