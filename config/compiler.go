@@ -70,8 +70,6 @@ func (compiler *Compiler) Compile(ctx context.Context, writer io.Writer, target 
 	return nil
 }
 
-func (compiler *Compiler) compile(stdin io.Reader, stdout, stderr io.Writer, target string) error {
-	ctx, cancel := context.WithCancel(context.Background())
 func (compiler *Compiler) compile(ctx context.Context, stdin io.Reader, stdout, stderr io.Writer, target string) error {
 	ctx, cancel := context.WithCancel(ctx)
 
