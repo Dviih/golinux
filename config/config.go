@@ -46,6 +46,7 @@ type Config struct {
 
 	Project   string               `yaml:"project"`
 	Compilers map[string]*Compiler `yaml:"compilers"`
+	Kernels   map[string]*Kernel   `yaml:"kernel"`
 }
 
 func (config *Config) Sync() error {
@@ -83,6 +84,19 @@ func (config *Config) Compiler(name string) *Compiler {
 	compiler.project = config.Project
 
 	return compiler
+}
+
+func (config *Config) Kernel(name string) *Kernel {
+	kernel, ok := config.Kernels[name]
+	if !ok {
+		return &Kernel{name: name}
+	}
+
+	kernel.name = name
+	kernel.compiler = config.Compiler(kernel.Compiler)
+	kernel.Path = util.WDKernel(config.Project)
+
+	return kernel
 }
 
 func FromPath(path string) (*Config, error) {
