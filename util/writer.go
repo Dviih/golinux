@@ -41,3 +41,10 @@ func (writer *Writer) Data() []byte {
 	return data
 }
 
+func (writer *Writer) Error(err error) error {
+	if writer.data == nil {
+		return err
+	}
+
+	return errors.Join(err, errors.New(string(writer.data)))
+}
