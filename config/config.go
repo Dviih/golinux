@@ -21,6 +21,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"github.com/Dviih/golinux/util"
 	"gopkg.in/yaml.v3"
 	"io"
@@ -150,6 +151,34 @@ func (config *Config) Runner(name string) *Runner {
 	runner.project = config.Project
 
 	return runner
+}
+
+func (config *Config) String() string {
+	compilers := func() (ret []string) {
+		for name := range config.Compilers {
+			ret = append(ret, name)
+		}
+
+		return ret
+	}()
+
+	kernels := func() (ret []string) {
+		for name := range config.Kernels {
+			ret = append(ret, name)
+		}
+
+		return ret
+	}()
+
+	packages := func() (ret []string) {
+		for name := range config.Packages {
+			ret = append(ret, name)
+		}
+
+		return ret
+	}()
+
+	return fmt.Sprintf("{Project: %s Compilers: %v Kernels: %v Packages: %v Default.Package: %s Use.Kernel: %s}", config.Project, compilers, kernels, packages, config.DefaultPackage, config.UseKernel)
 }
 
 func FromPath(path string) (*Config, error) {
