@@ -94,7 +94,7 @@ func (config *Config) Kernel(name string) *Kernel {
 
 	kernel.name = name
 	kernel.compiler = config.Compiler(kernel.Compiler)
-	kernel.Path = util.WDKernel(config.Project)
+	kernel.Path = util.WDKernel(config.Project, kernel.Name())
 
 	return kernel
 }
