@@ -34,3 +34,32 @@ import (
 
 const KernelMirror = "https://cdn.kernel.org/pub/linux/kernel/v%s.x/linux-%s.tar.gz"
 
+func GetKernel(project, target, version string) error {
+	switch target[0] {
+	case 'v':
+		target = path.Join(WD(), ".golinux", project, "kernel", target[1:])
+	case '/':
+		break
+	default:
+		target = path.Join(WD(), ".golinux", project, "kernel", target)
+	}
+
+	ctx, cancel := context.WithCancelCause(context.Background())
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fmt.Sprintf(KernelMirror, version[:strings.IndexByte(version, '.')], version), nil)
+	if err != nil {
+		return err
+	}
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+
+	defer func(Body io.ReadCloser) {
+		if err = Body.Close(); err != nil {
+			cancel(err)
+		}
+	}(res.Body)
+
+}
