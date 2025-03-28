@@ -21,7 +21,13 @@ func WD(paths ...interface{}) string {
 		return wd
 	}
 
-	return path.Join(wdAppend(wd, paths)...)
+	pathsString := []string{wd}
+
+	for _, v := range paths {
+		pathsString = append(pathsString, v.(string))
+	}
+
+	return path.Join(pathsString...)
 }
 
 func SetWD(s string) {
