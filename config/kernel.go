@@ -1,11 +1,11 @@
 package config
 
 import (
-	"bytes"
 	"context"
+	"github.com/Dviih/golinux/util"
 	"io"
 	"os"
-	"path"
+	"os/exec"
 )
 
 type Kernel struct {
