@@ -67,6 +67,8 @@ type Config struct {
 	Compilers map[string]*Compiler `yaml:"compilers"`
 	Kernels   map[string]*Kernel   `yaml:"kernel"`
 	Packages  map[string]*Package  `yaml:"packages"`
+	Runners   map[string]*Runner   `yaml:"runners"`
+
 	DefaultPackage string `yaml:"default_package"`
 }
 
@@ -135,6 +137,18 @@ func (config *Config) Package(name string) *Package {
 	}
 
 	return pkg
+}
+
+func (config *Config) Runner(name string) *Runner {
+	runner, ok := config.Runners[name]
+	if !ok {
+		return &Runner{}
+	}
+
+	runner.name = name
+	runner.project = config.Project
+
+	return runner
 }
 
 func FromPath(path string) (*Config, error) {
