@@ -42,3 +42,24 @@ var namedRunnerKind = map[RunnerKind]string{
 	RunnerKindKVM:     "kvm",
 }
 
+func (kind *RunnerKind) UnmarshalYAML(node *yaml.Node) error {
+	var s string
+
+	if err := node.Decode(&s); err != nil {
+		return err
+	}
+
+	switch strings.ToLower(s) {
+	case namedRunnerKind[RunnerKindCommand]:
+		*kind = RunnerKindCommand
+	case namedRunnerKind[RunnerKindQEMU]:
+		*kind = RunnerKindQEMU
+	case namedRunnerKind[RunnerKindKVM]:
+		*kind = RunnerKindKVM
+	default:
+		return errors.New("invalid RunnerKind")
+	}
+
+	return nil
+}
+
