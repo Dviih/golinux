@@ -80,3 +80,14 @@ type Runner struct {
 	Arguments   KVS               `yaml:"arguments"`
 }
 
+func (runner *Runner) Execute(ctx context.Context, stdin io.Reader, stdout io.Writer, stderr io.Writer) error {
+	compiler := &Compiler{
+		name:        runner.name,
+		project:     runner.project,
+		Call:        runner.Call,
+		Environment: runner.Environment,
+		Arguments:   runner.Arguments,
+	}
+
+	return compiler.compile(ctx, stdin, stdout, stderr, util.WDProject(compiler.project))
+}
