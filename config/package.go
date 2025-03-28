@@ -13,3 +13,7 @@ type Package struct {
 	Compiler string    `yaml:"compiler"`
 }
 
+func (pkg *Package) Name() string {
+	return pkg.name
+}
+
