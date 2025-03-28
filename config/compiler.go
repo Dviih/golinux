@@ -31,7 +31,7 @@ func (compiler *Compiler) GetEnvironment() []string {
 }
 
 func (compiler *Compiler) GetArgs() []string {
-	arguments := strings.Split(compiler.Call, " ")[1:]
+	arguments := strings.Split(compiler.Call, " ")
 
 	for _, argument := range compiler.Arguments {
 		if argument.Value == "" {
