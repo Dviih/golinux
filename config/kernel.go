@@ -37,6 +37,10 @@ func (kernel *Kernel) Menu(ctx context.Context) error {
 	return nil
 }
 
+var configMap = map[string]string{
+	"CONFIG_DEFAULT_HOSTNAME": "golinux",
+}
+
 func (kernel *Kernel) Build(ctx context.Context, writer io.Writer) error {
 	return kernel.compiler.Compile(ctx, writer, kernel.Path)
 }
