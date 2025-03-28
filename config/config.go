@@ -101,6 +101,23 @@ func (config *Config) Kernel(name string) *Kernel {
 	return kernel
 }
 
+func (config *Config) Package(name string) *Package {
+	pkg, ok := config.Packages[name]
+	if !ok {
+		return &Package{}
+	}
+
+	pkg.name = name
+	pkg.compiler = config.Compiler(pkg.Compiler)
+
+	if pkg.Target != "" && pkg.Path == "" {
+		pkg.Path = util.WD(pkg.Target)
+		pkg.Target = ""
+	}
+
+	return pkg
+}
+
 func FromPath(path string) (*Config, error) {
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
