@@ -17,3 +17,6 @@ func (pkg *Package) Name() string {
 	return pkg.name
 }
 
+func (pkg *Package) Build(ctx context.Context, writer io.Writer) error {
+	return pkg.compiler.Compile(ctx, writer, pkg.Name())
+}
