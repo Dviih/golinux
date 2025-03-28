@@ -1,3 +1,22 @@
+/*
+ *     Execute binaries on bare Linux.
+ *     Copyright (C) 2025  Dviih
+ *
+ *     This program is free software: you can redistribute it and/or modify
+ *     it under the terms of the GNU Affero General Public License as published
+ *     by the Free Software Foundation, either version 3 of the License, or
+ *     (at your option) any later version.
+ *
+ *     This program is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU Affero General Public License for more details.
+ *
+ *     You should have received a copy of the GNU Affero General Public License
+ *     along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ */
+
 package config
 
 import (
@@ -47,6 +66,8 @@ type Config struct {
 	Project   string               `yaml:"project"`
 	Compilers map[string]*Compiler `yaml:"compilers"`
 	Kernels   map[string]*Kernel   `yaml:"kernel"`
+	Packages  map[string]*Package  `yaml:"packages"`
+	DefaultPackage string `yaml:"default_package"`
 }
 
 func (config *Config) Sync() error {
@@ -97,6 +118,23 @@ func (config *Config) Kernel(name string) *Kernel {
 	kernel.Path = util.WDKernel(config.Project, kernel.Name())
 
 	return kernel
+}
+
+func (config *Config) Package(name string) *Package {
+	pkg, ok := config.Packages[name]
+	if !ok {
+		return &Package{}
+	}
+
+	pkg.name = name
+	pkg.compiler = config.Compiler(pkg.Compiler)
+
+	if pkg.Target != "" && pkg.Path == "" {
+		pkg.Path = util.WD(pkg.Target)
+		pkg.Target = ""
+	}
+
+	return pkg
 }
 
 func FromPath(path string) (*Config, error) {
