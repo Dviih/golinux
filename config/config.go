@@ -48,6 +48,7 @@ type Config struct {
 	Compilers map[string]*Compiler `yaml:"compilers"`
 	Kernels   map[string]*Kernel   `yaml:"kernel"`
 	Packages  map[string]*Package  `yaml:"packages"`
+	DefaultPackage string `yaml:"default_package"`
 }
 
 func (config *Config) Sync() error {
