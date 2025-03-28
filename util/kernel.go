@@ -32,3 +32,5 @@ import (
 	"strings"
 )
 
+const KernelMirror = "https://cdn.kernel.org/pub/linux/kernel/v%s.x/linux-%s.tar.gz"
+
