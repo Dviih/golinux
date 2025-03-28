@@ -34,15 +34,15 @@ func SetWD(s string) {
 }
 
 func WDProject(project string, paths ...interface{}) string {
-	return WD(".golinux", project, paths)
+	return WD(wdAppend(".golinux", project, paths)...)
 }
 
 func WDInitramfs(project string, paths ...interface{}) string {
-	return WDProject(project, "initramfs", paths)
+	return WDProject(project, wdAppend("initramfs", paths)...)
 }
 
-func WDKernel(project string, paths ...interface{}) string {
-	return WDProject(project, "kernel", paths)
+func WDKernel(project, kernel string, paths ...interface{}) string {
+	return WDProject(project, wdAppend("kernel", kernel, paths)...)
 }
 
 func wdAppend(v ...interface{}) []string {
