@@ -75,4 +75,48 @@ func GetKernel(project, target, version string) error {
 
 	treader := tar.NewReader(greader)
 
+	for {
+		select {
+		case <-ctx.Done():
+			return ctx.Err()
+		default:
+			header, err := treader.Next()
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+
+				return err
+			}
+
+			if i := strings.IndexByte(header.Name, '/'); i != -1 {
+				header.Name = header.Name[i:]
+			}
+
+			if header.FileInfo().IsDir() {
+				if err = os.MkdirAll(path.Join(target, header.Name), 0750); err != nil {
+					return err
+				}
+				continue
+			}
+
+			file, err := os.Create(path.Join(target, header.Name))
+			if err != nil {
+				return err
+			}
+
+			if err = file.Chmod(os.FileMode(header.Mode)); err != nil {
+				return err
+			}
+
+			n, err := io.CopyN(file, treader, header.Size)
+			if err != nil {
+				return err
+			}
+
+			if n != header.Size {
+				return errors.New("not the same size written")
+			}
+		}
+	}
 }
