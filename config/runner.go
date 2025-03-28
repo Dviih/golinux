@@ -63,3 +63,11 @@ func (kind *RunnerKind) UnmarshalYAML(node *yaml.Node) error {
 	return nil
 }
 
+func (kind *RunnerKind) MarshalYAML() (interface{}, error) {
+	return kind.String(), nil
+}
+
+func (kind *RunnerKind) String() string {
+	return namedRunnerKind[*kind]
+}
+
