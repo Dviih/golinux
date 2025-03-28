@@ -65,5 +65,9 @@ func (kernel *Kernel) config(ctx context.Context) error {
 }
 
 func (kernel *Kernel) Build(ctx context.Context, writer io.Writer) error {
+	if err := kernel.config(ctx); err != nil {
+		return err
+	}
+
 	return kernel.compiler.Compile(ctx, writer, kernel.Path)
 }
