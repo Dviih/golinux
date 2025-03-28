@@ -41,6 +41,29 @@ var configMap = map[string]string{
 	"CONFIG_DEFAULT_HOSTNAME": "golinux",
 }
 
+func (kernel *Kernel) config(ctx context.Context) error {
+	configMap := configMap
+	configMap["CONFIG_INITRAMFS_SOURCE"] = util.WDInitramfs(kernel.compiler.project)
+
+	for property, value := range configMap {
+		var cmd *exec.Cmd
+
+		if value == "" {
+			cmd = exec.CommandContext(ctx, "./scripts/config", "--enable", property)
+		} else {
+			cmd = exec.CommandContext(ctx, "./scripts/config", "--set-str", property, value)
+		}
+
+		cmd.Dir = util.WDKernel(kernel.compiler.project, kernel.Name())
+
+		if err := cmd.Run(); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (kernel *Kernel) Build(ctx context.Context, writer io.Writer) error {
 	return kernel.compiler.Compile(ctx, writer, kernel.Path)
 }
