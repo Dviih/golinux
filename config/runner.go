@@ -36,3 +36,9 @@ const (
 	RunnerKindKVM
 )
 
+var namedRunnerKind = map[RunnerKind]string{
+	RunnerKindCommand: "command",
+	RunnerKindQEMU:    "qemu",
+	RunnerKindKVM:     "kvm",
+}
+
