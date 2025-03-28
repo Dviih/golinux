@@ -28,3 +28,11 @@ import (
 	"strings"
 )
 
+type RunnerKind int
+
+const (
+	RunnerKindCommand RunnerKind = iota
+	RunnerKindQEMU
+	RunnerKindKVM
+)
+
