@@ -71,3 +71,12 @@ func (kind *RunnerKind) String() string {
 	return namedRunnerKind[*kind]
 }
 
+type Runner struct {
+	name        string            `yaml:"-"`
+	project     string            `yaml:"-"`
+	Call        string            `yaml:"call"`
+	Kind        *RunnerKind       `yaml:"kind"`
+	Environment map[string]string `yaml:"environment"`
+	Arguments   KVS               `yaml:"arguments"`
+}
+
