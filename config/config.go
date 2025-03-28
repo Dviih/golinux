@@ -70,6 +70,7 @@ type Config struct {
 	Runners   map[string]*Runner   `yaml:"runners"`
 
 	DefaultPackage string `yaml:"default_package"`
+	UseKernel      string `yaml:"use_kernel"`
 }
 
 func (config *Config) Sync() error {
