@@ -25,3 +25,19 @@ type Writer struct {
 	data []byte
 }
 
+func (writer *Writer) Write(data []byte) (int, error) {
+	writer.data = append(writer.data, data...)
+	return len(data), nil
+}
+
+func (writer *Writer) Len() int {
+	return len(writer.data)
+}
+
+func (writer *Writer) Data() []byte {
+	data := make([]byte, len(writer.data))
+
+	copy(data, writer.data)
+	return data
+}
+
