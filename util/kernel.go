@@ -62,4 +62,17 @@ func GetKernel(project, target, version string) error {
 		}
 	}(res.Body)
 
+	greader, err := gzip.NewReader(res.Body)
+	if err != nil {
+		return err
+	}
+
+	defer func(reader *gzip.Reader) {
+		if err = reader.Close(); err != nil {
+			cancel(err)
+		}
+	}(greader)
+
+	treader := tar.NewReader(greader)
+
 }
