@@ -139,4 +139,17 @@ var (
 			return config.Runner(flag.Arg(1)).Execute(ctx, os.Stdin, os.Stdout, os.Stderr)
 		},
 	}
+
+	commandsNames = Keys(commands)
 )
+
+func Keys[K comparable, V any](m map[K]V) []K {
+	var keys []K
+
+	for key := range m {
+		keys = append(keys, key)
+	}
+
+	return keys
+}
+
