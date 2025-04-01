@@ -76,5 +76,40 @@ var (
 
 			return nil
 		},
+		"build": func(ctx context.Context, config *config.Config) error {
+			name := flag.Arg(1)
+
+			if name == "" {
+				name = config.DefaultPackage
+			}
+
+			pkg := config.Package(name)
+
+			log.InfoContext(ctx, "requested package build", slog.String("package", pkg.Name()))
+
+			if err := buildPackage(ctx, config, pkg); err != nil {
+				log.ErrorContext(ctx, "failed to build package",
+					slog.String("package", name),
+					slog.Any("error", err),
+				)
+
+				return err
+			}
+
+			kernel := config.Kernel(config.UseKernel)
+
+			log.InfoContext(ctx, "requested kernel build", slog.String("kernel", kernel.Name()))
+
+			if err := kernel.Build(context.Background(), nil); err != nil {
+				log.ErrorContext(ctx, "failed to build kernel",
+					slog.String("kernel", kernel.Name()),
+					slog.Any("error", err),
+				)
+
+				return err
+			}
+
+			return nil
+		},
 	}
 )
