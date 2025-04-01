@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"github.com/Dviih/golinux/config"
 	"github.com/Dviih/golinux/util"
@@ -110,6 +111,13 @@ var (
 			}
 
 			return nil
+		},
+		"run": func(ctx context.Context, config *config.Config) error {
+			if flag.Arg(1) == "" {
+				return errors.New("missing runner name")
+			}
+
+			return config.Runner(flag.Arg(1)).Execute(ctx, os.Stdin, os.Stdout, os.Stderr)
 		},
 	}
 )
