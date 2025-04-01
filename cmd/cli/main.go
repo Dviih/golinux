@@ -120,7 +120,7 @@ var (
 
 			log.InfoContext(ctx, "requested kernel build", slog.String("kernel", kernel.Name()))
 
-			if err := kernel.Build(context.Background(), nil); err != nil {
+			if err := kernel.Build(ctx, nil); err != nil {
 				log.ErrorContext(ctx, "failed to build kernel",
 					slog.String("kernel", kernel.Name()),
 					slog.Any("error", err),
