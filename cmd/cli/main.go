@@ -220,4 +220,31 @@ func main() {
 		return
 	}
 
+	if flag.NArg() < 1 {
+		log.ErrorContext(ctx, "unspecified command", slog.Any("available", commandsNames))
+		return
+	}
+
+	command, ok := commands[strings.ToLower(flag.Arg(0))]
+	if !ok {
+		log.ErrorContext(ctx, "invalid command",
+			slog.String("received", flag.Arg(0)),
+			slog.Any("available", commandsNames),
+		)
+
+		return
+	}
+
+	log.InfoContext(ctx, "command requested", slog.String("command", flag.Arg(0)))
+
+	if err = command(ctx, c); err != nil {
+		log.ErrorContext(ctx, "command failed with error",
+			slog.String("command", flag.Arg(0)),
+			slog.Any("error", err),
+		)
+
+		return
+	}
+
+	log.InfoContext(ctx, "command execution done", slog.String("command", flag.Arg(0)))
 }
