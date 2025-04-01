@@ -196,3 +196,28 @@ func buildPackage(ctx context.Context, config *config.Config, pkg *config.Packag
 	return nil
 }
 
+func main() {
+	flag.StringVar(&WD, "wd", "", "The path to the working directory")
+	flag.StringVar(&ConfigPath, "config", "golinux.yaml", "path to the config")
+
+	flag.Parse()
+
+	if WD == "" {
+		WD = util.WD()
+	} else {
+		util.SetWD(WD)
+	}
+
+	if ConfigPath[0] != '/' {
+		ConfigPath = path.Join(WD, ConfigPath)
+	}
+
+	ctx := context.Background()
+
+	c, err := config.FromPath(ConfigPath)
+	if err != nil {
+		log.ErrorContext(ctx, "failed to initialize config from path", slog.Any("error", err))
+		return
+	}
+
+}
