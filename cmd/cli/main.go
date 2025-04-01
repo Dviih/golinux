@@ -11,3 +11,11 @@ import (
 	"strings"
 )
 
+var (
+	log = slog.Default()
+
+	WD         string
+	ConfigPath string
+	version    string
+
+)
