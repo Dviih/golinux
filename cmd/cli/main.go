@@ -153,3 +153,46 @@ func Keys[K comparable, V any](m map[K]V) []K {
 	return keys
 }
 
+func buildPackage(ctx context.Context, config *config.Config, pkg *config.Package) error {
+	log.InfoContext(ctx, "build requested",
+		slog.String("project", config.Project),
+		slog.String("kernel", config.UseKernel),
+		slog.String("package", path.Base(pkg.Path)),
+	)
+
+	target := pkg.Name()
+	if target == config.DefaultPackage {
+		target = "init"
+	}
+
+	file, err := os.Create(util.WDInitramfs(config.Project, target))
+	if err != nil {
+		log.ErrorContext(ctx, "failed to create file",
+			slog.String("path", util.WDInitramfs(config.Project, target)),
+			slog.Any("error", err),
+		)
+
+		return err
+	}
+
+	defer func(file *os.File) {
+		if err = file.Close(); err != nil {
+			log.ErrorContext(ctx, "failed to close file",
+				slog.String("package", pkg.Name()),
+				slog.Any("error", err),
+			)
+		}
+	}(file)
+
+	if err = pkg.Build(ctx, file); err != nil {
+		log.ErrorContext(ctx, "failed to compile package",
+			slog.String("package", pkg.Name()),
+			slog.Any("error", err),
+		)
+
+		return err
+	}
+
+	return nil
+}
+
