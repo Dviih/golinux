@@ -302,12 +302,12 @@ func (main Main) View() string {
 
 func NewMain(config *config.Config) Main {
 	return Main{
-		state:    0,
-		models:   make(map[State]tea.Model),
-		config:   config,
-		bindings: helpMap,
-		help:     help.New(),
-		style:    lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
+		models:     make(map[State]tea.Model),
+		config:     config,
+		configArea: textarea.New(),
+		bindings:   helpMap,
+		help:       help.New(),
+		style:      lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
 	}
 }
 
