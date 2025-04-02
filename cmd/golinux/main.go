@@ -24,6 +24,7 @@ import (
 	"github.com/Dviih/golinux/config"
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"reflect"
@@ -78,6 +79,9 @@ type Main struct {
 	state  State
 	models map[State]tea.Model
 	config *config.Config
+
+	configAreaActive bool
+	configArea       textarea.Model
 
 	bindings *HelpMap
 	help     help.Model
