@@ -41,4 +41,15 @@ func main() {
 		panic(err)
 	}
 
+	model := NewMain(c)
+	model.models = map[State]tea.Model{
+		StateCompilers: NewList("Compilers", c.Compilers),
+		StateKernels:   NewList("Kernels", c.Kernels),
+		StatePackages:  NewList("Packages", c.Packages),
+		StateRunners:   NewList("Runners", c.Runners),
+	}
+
+	if _, err := tea.NewProgram(model, tea.WithAltScreen()).Run(); err != nil {
+		panic(err)
+	}
 }
