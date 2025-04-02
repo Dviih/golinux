@@ -61,3 +61,19 @@ func (item *backItem) FilterValue() string {
 	return ""
 }
 
+type createItem struct {
+	t reflect.Type
+}
+
+func (item *createItem) Title() string {
+	return "Create"
+}
+
+func (item *createItem) Description() string {
+	return "Create " + item.t.String()
+}
+
+func (item *createItem) FilterValue() string {
+	return ""
+}
+
