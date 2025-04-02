@@ -255,6 +255,11 @@ func (main Main) View() string {
 		return style.AlignVertical(lipgloss.Center).Height(main.size.Height - 2).Width(main.size.Width - 2).Render(main.help.View(main.bindings))
 	}
 
+	if main.configAreaActive {
+		view := style.UnsetBorderStyle().AlignVertical(lipgloss.Top).Render(main.configArea.View()) + "\n" + "Golinux Alpha | Loaded Project: " + main.config.Project + "\n" + main.help.View(main.bindings)
+		return style.Height(main.size.Height - 2).Width(main.size.Width - 2).Render(view)
+	}
+
 	if main.exec != nil {
 		if !main.exec.hasSelected {
 			view := style.UnsetBorderStyle().AlignVertical(lipgloss.Top).Render(main.exec.View()) + "\n" + "Golinux Alpha | Loaded Project: " + main.config.Project + "\n" + main.help.View(main.bindings)
