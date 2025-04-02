@@ -49,3 +49,23 @@ type Exec struct {
 	Handler func(*tea.Program, string) func()
 }
 
+func (exec *Exec) Init() tea.Cmd {
+	exec.viewport = viewport.New(10, 10)
+	exec.viewport.YPosition = 20
+
+	var items []list.Item
+
+	for _, option := range exec.options {
+		items = append(items, &Item{
+			title: option,
+		})
+	}
+
+	delegation := list.NewDefaultDelegate()
+	delegation.ShowDescription = false
+
+	exec.selectList = list.New(items, delegation, 0, 0)
+	exec.selectList.Title = "Select a package to build"
+	return nil
+}
+
