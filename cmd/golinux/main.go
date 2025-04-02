@@ -88,3 +88,13 @@ type Main struct {
 	focus bool
 }
 
+func (main Main) Init() tea.Cmd {
+	var cmds []tea.Cmd
+
+	for _, model := range main.models {
+		cmds = append(cmds, model.Init())
+	}
+
+	return tea.Batch(cmds...)
+}
+
