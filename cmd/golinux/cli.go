@@ -31,7 +31,7 @@ var (
 )
 
 func main() {
-	flag.StringVar(&wd, "wd", "", "The path to the working directory")
+	flag.StringVar(&wd, "wd", util.WD(), "The path to the working directory")
 	flag.Parse()
 
 	util.SetWD(wd)
