@@ -47,3 +47,17 @@ func (item *Item) FilterValue() string {
 	return item.Title()
 }
 
+type backItem struct{}
+
+func (item *backItem) Title() string {
+	return "Back"
+}
+
+func (item *backItem) Description() string {
+	return "Go back"
+}
+
+func (item *backItem) FilterValue() string {
+	return ""
+}
+
