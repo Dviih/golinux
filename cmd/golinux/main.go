@@ -330,3 +330,10 @@ func setValue(value reflect.Value, s string) {
 	}
 }
 
+func rvAbs(value reflect.Value) reflect.Value {
+	for value.Kind() == reflect.Pointer {
+		value = value.Elem()
+	}
+
+	return value
+}
