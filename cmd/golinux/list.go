@@ -133,6 +133,8 @@ func (l *List) Init() tea.Cmd {
 				description: kv.Field(1),
 			})
 		}
+
+		items = append(items, &createItem{t: rv.Type().Elem()})
 	} else {
 		switch rv.Kind() {
 		case reflect.Map:
@@ -314,23 +316,31 @@ func (l *List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					l.currentInput = nil
 					return l, nil
 				case *LICreate:
-					switch l.rv.Kind() {
-					case reflect.Map:
-						key := reflect.New(l.rv.Type().Key()).Elem()
-						setValue(key, l.currentInput.input.Value())
-
-						ptr := reflect.New(m.t)
-
-						for tmp := ptr.Elem(); tmp.Kind() == reflect.Pointer; {
-							if !tmp.CanSet() {
-								break
-							}
-
-							tmp.Set(reflect.New(tmp.Type().Elem()))
-							tmp = tmp.Elem()
+					if l.rv.Type() == reflect.TypeFor[config.KVS]() {
+						kv := &config.KV{
+							Key: l.currentInput.input.Value(),
 						}
 
-						l.rv.SetMapIndex(key, ptr.Elem())
+						l.rv.Set(reflect.Append(l.rv, reflect.ValueOf(kv)))
+					} else {
+						switch l.rv.Kind() {
+						case reflect.Map:
+							key := reflect.New(l.rv.Type().Key()).Elem()
+							setValue(key, l.currentInput.input.Value())
+
+							ptr := reflect.New(m.t)
+
+							for tmp := ptr.Elem(); tmp.Kind() == reflect.Pointer; {
+								if !tmp.CanSet() {
+									break
+								}
+
+								tmp.Set(reflect.New(tmp.Type().Elem()))
+								tmp = tmp.Elem()
+							}
+
+							l.rv.SetMapIndex(key, ptr.Elem())
+						}
 					}
 
 					l.currentInput = nil
@@ -341,6 +351,22 @@ func (l *List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 					return l, nil
 				}
+			}
+
+			if item, ok := l.list.Items()[l.list.Index()].(*createItem); ok {
+				input := textinput.New()
+
+				input.Focus()
+
+				l.currentInput = &ListInput{
+					action: ListInputActionCreate,
+					rv:     l.rv,
+					name:   item.t.String(),
+					input:  input,
+					extra:  &LICreate{t: item.t},
+				}
+
+				goto end
 			}
 
 			if l.rv.Type() == reflect.TypeFor[config.KVS]() {
@@ -355,22 +381,6 @@ func (l *List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 					rv:     kv.Field(1),
 					name:   toString(kv.Field(0)),
 					input:  input,
-				}
-
-				goto end
-			}
-
-			if item, ok := l.list.Items()[l.list.Index()].(*createItem); ok {
-				input := textinput.New()
-
-				input.Focus()
-
-				l.currentInput = &ListInput{
-					action: ListInputActionCreate,
-					rv:     l.rv,
-					name:   item.t.String(),
-					input:  input,
-					extra:  &LICreate{t: item.t},
 				}
 
 				goto end
