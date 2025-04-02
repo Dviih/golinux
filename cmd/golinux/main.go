@@ -40,3 +40,37 @@ const (
 	StateLast
 )
 
+type HelpMap struct {
+	Tab     key.Binding
+	Help    key.Binding
+	Config  key.Binding
+	Sync    key.Binding
+	Quit    key.Binding
+	Zoom    key.Binding
+	Rename  key.Binding
+	Build   key.Binding
+	Execute key.Binding
+}
+
+func (help *HelpMap) ShortHelp() []key.Binding {
+	return []key.Binding{help.Help, help.Quit}
+}
+
+func (help *HelpMap) FullHelp() [][]key.Binding {
+	return [][]key.Binding{
+		{help.Tab, help.Help, help.Config, help.Sync, help.Quit, help.Zoom, help.Rename},
+	}
+}
+
+var helpMap = &HelpMap{
+	Tab:     key.NewBinding(key.WithKeys(tea.KeyTab.String()), key.WithHelp("tab", "switch state")),
+	Help:    key.NewBinding(key.WithKeys(tea.KeyCtrlH.String()), key.WithHelp("control + h(elp)", "show help")),
+	Config:  key.NewBinding(key.WithKeys(tea.KeyCtrlC.String()), key.WithHelp("control + c(onfig)", "show configuration")),
+	Sync:    key.NewBinding(key.WithKeys(tea.KeyCtrlS.String()), key.WithHelp("control + s(ync)", "sync current state to config")),
+	Quit:    key.NewBinding(key.WithKeys(tea.KeyCtrlQ.String(), tea.KeyEsc.String()), key.WithHelp("control + q(uit)", "quit golinux")),
+	Zoom:    key.NewBinding(key.WithKeys(tea.KeyCtrlZ.String()), key.WithHelp("control + z(oom))", "focus into a tab")),
+	Rename:  key.NewBinding(key.WithKeys(tea.KeyCtrlR.String()), key.WithHelp("control + r(ename)", "rename selected item")),
+	Build:   key.NewBinding(key.WithKeys(tea.KeyCtrlB.String()), key.WithHelp("control + b(uild)", "build a package")),
+	Execute: key.NewBinding(key.WithKeys(tea.KeyCtrlE.String()), key.WithHelp("control + e(execute)", "execute a package")),
+}
+
