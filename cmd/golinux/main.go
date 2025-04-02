@@ -234,3 +234,14 @@ func (main Main) View() string {
 	return style.Height(main.size.Height - 2).Width(main.size.Width - 2).Render(view)
 }
 
+func NewMain(config *config.Config) Main {
+	return Main{
+		state:    0,
+		models:   make(map[State]tea.Model),
+		config:   config,
+		bindings: helpMap,
+		help:     help.New(),
+		style:    lipgloss.NewStyle().Foreground(lipgloss.Color("#FF75B7")),
+	}
+}
+
