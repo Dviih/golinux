@@ -69,6 +69,60 @@ func (exec *Exec) Init() tea.Cmd {
 	return nil
 }
 
+func (exec *Exec) Update(msg tea.Msg) (*Exec, tea.Cmd) {
+	if !exec.hasSelected {
+		switch msg := msg.(type) {
+		case tea.WindowSizeMsg:
+			w, h := docStyle.GetFrameSize()
+			exec.selectList.SetSize(msg.Width-w, msg.Height-h-10)
+		case tea.KeyMsg:
+			switch msg.Type {
+			case tea.KeyEnter:
+				exec.hasSelected = true
+				exec.selected = exec.selectList.Index()
+
+				exec.viewport.Width = exec.selectList.Width()
+				exec.viewport.Height = exec.selectList.Height() - 10
+
+				exec.Handler(exec.program, exec.options[exec.selected])
+			}
+		}
+
+		m, cmd := exec.selectList.Update(msg)
+
+		exec.selectList = m
+		return exec, cmd
+	}
+
+	exec.done = true
+
+	var cmds []tea.Cmd
+
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		th := lipgloss.Height(exec.header())
+		h := th + lipgloss.Height(exec.footer())
+
+		exec.viewport.YPosition = th
+		exec.viewport.Width = msg.Width
+		exec.viewport.Height = msg.Height - h
+
+		cmds = append(cmds, viewport.Sync(exec.viewport))
+	case ExecData:
+		exec.data = append(exec.data, msg.Data...)
+	case ExecProgram:
+		exec.program = msg.Program
+	}
+
+	exec.viewport.SetContent(string(exec.data))
+
+	m, cmd := exec.viewport.Update(msg)
+	cmds = append(cmds, cmd)
+
+	exec.viewport = m
+
+	return exec, tea.Batch(cmds...)
+}
 
 func (exec *Exec) View() string {
 	if !exec.hasSelected {
