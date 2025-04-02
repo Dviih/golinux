@@ -77,3 +77,12 @@ func (item *createItem) FilterValue() string {
 	return ""
 }
 
+type List struct {
+	Title        string
+	size         tea.WindowSizeMsg
+	list         list.Model
+	rv           reflect.Value
+	currentInput *ListInput
+	back         *List
+}
+
