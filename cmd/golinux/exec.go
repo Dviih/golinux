@@ -27,3 +27,25 @@ type ExecProgram struct {
 	Program *tea.Program
 }
 
+type ExecStyles struct {
+	Title lipgloss.Style
+	Info  lipgloss.Style
+}
+
+type Exec struct {
+	Styles   ExecStyles
+	program  *tea.Program
+	viewport viewport.Model
+
+	data  []byte
+	limit int
+
+	options     []string
+	selectList  list.Model
+	hasSelected bool
+	selected    int
+
+	done    bool
+	Handler func(*tea.Program, string) func()
+}
+
