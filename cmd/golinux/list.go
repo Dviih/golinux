@@ -478,3 +478,59 @@ func (l *List) View() string {
 	return docStyle.Render(l.list.View())
 }
 
+type ListInputAction int
+
+const (
+	ListInputActionEdit ListInputAction = iota
+	ListInputActionCreate
+	ListInputActionRename
+)
+
+type ListInput struct {
+	action ListInputAction
+	rv     reflect.Value
+	name   string
+	input  textinput.Model
+	extra  interface{}
+}
+
+func (listInput *ListInput) Action() string {
+	switch listInput.action {
+	case ListInputActionEdit:
+		return "Editing: "
+	case ListInputActionCreate:
+		return "Creating: "
+	case ListInputActionRename:
+		return "Renaming: "
+	default:
+		return "<unknown action>: "
+	}
+}
+
+type LIKV struct {
+	*ListInput
+}
+
+type LIMap struct {
+	m   reflect.Value
+	key reflect.Value
+}
+
+func (m *LIMap) Get() reflect.Value {
+	return m.m.MapIndex(m.key)
+}
+
+func (m *LIMap) Set(value reflect.Value) {
+	m.m.SetMapIndex(m.key, value)
+}
+
+type LICreate struct {
+	t reflect.Type
+}
+
+func NewList[T interface{}](title string, t T) *List {
+	return &List{
+		Title: title,
+		rv:    reflect.ValueOf(t),
+	}
+}
