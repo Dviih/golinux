@@ -86,6 +86,18 @@ type List struct {
 	back         *List
 }
 
+func (l *List) title() string {
+	s := ""
+
+	tmp := l
+
+	for tmp != nil {
+		s = strings.ToUpper(string(tmp.Title[0])) + tmp.Title[1:] + "." + s
+		tmp = tmp.back
+	}
+
+	return s[:len(s)-1]
+}
 
 func (l *List) Init() tea.Cmd {
 	rv := rvAbs(l.rv)
@@ -451,5 +463,18 @@ end:
 	l.list = m
 
 	return l, cmd
+}
+
+func (l *List) View() string {
+	if l.currentInput != nil {
+		switch extra := l.currentInput.extra.(type) {
+		case *LIKV:
+			return l.list.Styles.Title.Render(l.currentInput.Action()+l.title()) + "\n" + l.currentInput.input.View() + "\n" + extra.input.View()
+		default:
+			return l.list.Styles.Title.Render(l.currentInput.Action()+l.title()) + "\n" + l.currentInput.input.View()
+		}
+	}
+
+	return docStyle.Render(l.list.View())
 }
 
