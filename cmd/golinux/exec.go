@@ -10,3 +10,20 @@ import (
 	"strings"
 )
 
+type Writer struct {
+	program *tea.Program
+}
+
+func (writer *Writer) Write(data []byte) (int, error) {
+	writer.program.Send(ExecData{Data: data})
+	return len(data), nil
+}
+
+type ExecData struct {
+	Data []byte
+}
+
+type ExecProgram struct {
+	Program *tea.Program
+}
+
