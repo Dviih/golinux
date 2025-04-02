@@ -214,3 +214,242 @@ func (l *List) Init() tea.Cmd {
 	return nil
 }
 
+func (l *List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyCtrlC:
+			return l, tea.Quit
+		case tea.KeyCtrlR:
+			if l.currentInput != nil {
+				break
+			}
+
+			rv := rvAbs(l.rv)
+
+			if rv.Kind() != reflect.Map {
+				break
+			}
+
+			item, ok := l.list.Items()[l.list.Index()].(*Item)
+			if !ok {
+				return l, nil
+			}
+
+			key := item.title.(reflect.Value)
+
+			input := textinput.New()
+			input.SetValue(toString(key))
+			input.Focus()
+
+			l.currentInput = &ListInput{
+				action: ListInputActionRename,
+				rv:     key,
+				name:   toString(key),
+				input:  input,
+			}
+		case tea.KeyEnter:
+			if _, ok := l.list.Items()[l.list.Index()].(*backItem); ok {
+				*l = *l.back
+				return l, l.Init()
+			}
+
+			if l.currentInput != nil {
+				if l.currentInput.input.Value() == "" && l.currentInput.action != ListInputActionCreate {
+					l.currentInput = nil
+					return l, nil
+				}
+
+				if l.currentInput.action == ListInputActionRename {
+					rv := rvAbs(l.rv)
+
+					nk := reflect.New(rv.Type().Key()).Elem()
+					setValue(nk, l.currentInput.input.Value())
+
+					rv.SetMapIndex(nk, rv.MapIndex(l.currentInput.rv))
+					rv.SetMapIndex(l.currentInput.rv, reflect.Value{})
+
+					l.currentInput = nil
+					return l, l.Init()
+				}
+
+				switch m := l.currentInput.extra.(type) {
+				case *LIMap:
+					ptr := reflect.New(m.Get().Type()).Elem()
+
+					setValue(ptr, l.currentInput.input.Value())
+					m.Set(ptr)
+
+					l.currentInput = nil
+					return l, nil
+				case *LICreate:
+					switch l.rv.Kind() {
+					case reflect.Map:
+						key := reflect.New(l.rv.Type().Key()).Elem()
+						setValue(key, l.currentInput.input.Value())
+
+						ptr := reflect.New(m.t)
+
+						for tmp := ptr.Elem(); tmp.Kind() == reflect.Pointer; {
+							if !tmp.CanSet() {
+								break
+							}
+
+							tmp.Set(reflect.New(tmp.Type().Elem()))
+							tmp = tmp.Elem()
+						}
+
+						l.rv.SetMapIndex(key, ptr.Elem())
+					}
+
+					l.currentInput = nil
+					return l, l.Init()
+				default:
+					setValue(l.currentInput.rv, l.currentInput.input.Value())
+					l.currentInput = nil
+
+					return l, nil
+				}
+			}
+
+			if l.rv.Type() == reflect.TypeFor[config.KVS]() {
+				kv := l.rv.Index(l.list.Index()).Elem()
+				input := textinput.New()
+
+				input.Focus()
+				input.SetValue(toString(kv.Field(1)))
+
+				l.currentInput = &ListInput{
+					action: ListInputActionEdit,
+					rv:     kv.Field(1),
+					name:   toString(kv.Field(0)),
+					input:  input,
+				}
+
+				goto end
+			}
+
+			if item, ok := l.list.Items()[l.list.Index()].(*createItem); ok {
+				input := textinput.New()
+
+				input.Focus()
+
+				l.currentInput = &ListInput{
+					action: ListInputActionCreate,
+					rv:     l.rv,
+					name:   item.t.String(),
+					input:  input,
+					extra:  &LICreate{t: item.t},
+				}
+
+				goto end
+			}
+
+			rv := rvAbs(l.rv)
+
+			switch rv.Kind() {
+			case reflect.Map:
+				key := l.list.Items()[l.list.Index()].(*Item).title.(reflect.Value)
+				mv := rvAbs(rv.MapIndex(key))
+
+				switch mv.Kind() {
+				case reflect.Map, reflect.Slice, reflect.Struct:
+					back := *l
+
+					m := &List{
+						Title:        toString(key),
+						size:         l.size,
+						rv:           mv,
+						currentInput: nil,
+						back:         &back,
+					}
+
+					return m, m.Init()
+				default:
+					input := textinput.New()
+
+					input.Focus()
+					input.SetValue(toString(mv))
+
+					l.currentInput = &ListInput{
+						action: ListInputActionEdit,
+						rv:     mv,
+						name:   toString(key),
+						input:  input,
+						extra: &LIMap{
+							m:   rv,
+							key: key,
+						},
+					}
+				}
+			case reflect.Struct:
+				rt := rv.Type()
+				k := 0
+
+				var (
+					field reflect.Value
+					ft    reflect.StructField
+				)
+
+				for i := 0; i < rt.NumField(); i++ {
+					if !rt.Field(i).IsExported() {
+						continue
+					}
+
+					if k == l.list.Index() {
+						field = rv.Field(i)
+						ft = rt.Field(i)
+						break
+					}
+
+					k++
+				}
+
+				switch field.Kind() {
+				case reflect.Map, reflect.Slice, reflect.Struct:
+					back := *l
+
+					m := &List{
+						Title:        ft.Name,
+						size:         l.size,
+						rv:           field,
+						currentInput: nil,
+						back:         &back,
+					}
+
+					return m, m.Init()
+				default:
+					input := textinput.New()
+
+					input.SetValue(toString(field))
+					input.Focus()
+
+					l.currentInput = &ListInput{
+						action: ListInputActionEdit,
+						rv:     field,
+						name:   ft.Name,
+						input:  input,
+					}
+				}
+			}
+		}
+	case tea.WindowSizeMsg:
+		w, h := docStyle.GetFrameSize()
+		l.list.SetSize(msg.Width-w, msg.Height-h-10)
+		l.size = msg
+	}
+
+end:
+	if l.currentInput != nil {
+		m, cmd := l.currentInput.input.Update(msg)
+		l.currentInput.input = m
+
+		return l, cmd
+	}
+
+	m, cmd := l.list.Update(msg)
+	l.list = m
+
+	return l, cmd
+}
+
