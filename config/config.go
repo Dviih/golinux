@@ -27,6 +27,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"sync"
 )
 
 type KV struct {
