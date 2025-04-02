@@ -98,3 +98,88 @@ func (main Main) Init() tea.Cmd {
 	return tea.Batch(cmds...)
 }
 
+func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.WindowSizeMsg:
+		main.size = msg
+		main.help.Width = msg.Width
+
+		for _, model := range main.models {
+			model.Update(msg)
+		}
+	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, main.bindings.Tab):
+			main.state++
+
+			if main.state >= StateLast {
+				main.state = 0
+			}
+
+			return main, nil
+		case key.Matches(msg, main.bindings.Help):
+			main.help.ShowAll = true
+			main.focus = true
+		case key.Matches(msg, main.bindings.Config):
+		case key.Matches(msg, main.bindings.Sync):
+		case key.Matches(msg, main.bindings.Quit):
+			if main.help.ShowAll {
+				main.help.ShowAll = false
+				main.focus = false
+				return main, nil
+			}
+
+			return main, tea.Quit
+		case key.Matches(msg, main.bindings.Zoom):
+			main.focus = !main.focus
+			return main, nil
+		case key.Matches(msg, main.bindings.Build):
+			if main.exec != nil {
+				if main.exec.done {
+					main.exec = nil
+				}
+
+				return main, nil
+			}
+
+			var packages []string
+
+			for name := range main.config.Packages {
+				packages = append(packages, name)
+			}
+
+			main.exec = NewExec(packages)
+			main.exec.Handler = func(program *tea.Program, s string) func() {
+				return func() {
+
+				}
+			}
+
+			main.exec.Init()
+
+			var cmd tea.Cmd
+			main.exec, cmd = main.exec.Update(main.size)
+
+			return main, cmd
+		default:
+		}
+	}
+
+	if main.exec != nil {
+		m, cmd := main.exec.Update(msg)
+
+		main.exec = m
+		return main, cmd
+	}
+
+	state, ok := main.models[main.state]
+	if !ok {
+		return main, nil
+	}
+
+	m, cmds := state.Update(msg)
+	main.models[main.state] = m
+
+	return main, cmds
+}
+
