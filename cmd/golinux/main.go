@@ -103,13 +103,19 @@ func (main Main) Init() tea.Cmd {
 }
 
 func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	var (
+		cmd  tea.Cmd
+		cmds []tea.Cmd
+	)
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		main.size = msg
 		main.help.Width = msg.Width
 
-		for _, model := range main.models {
-			model.Update(msg)
+		for i, model := range main.models {
+			main.models[i], cmd = model.Update(msg)
+			cmds = append(cmds, cmd)
 		}
 	case tea.KeyMsg:
 		switch {
@@ -160,19 +166,16 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 			main.exec.Init()
-
-			var cmd tea.Cmd
 			main.exec, cmd = main.exec.Update(main.size)
 
-			return main, cmd
+			return main, tea.Batch(append(cmds, cmd)...)
 		default:
 		}
 	}
 
-	if main.exec != nil {
-		m, cmd := main.exec.Update(msg)
 
-		main.exec = m
+	if main.exec != nil {
+		main.exec, cmd = main.exec.Update(msg)
 		return main, cmd
 	}
 
@@ -181,10 +184,10 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return main, nil
 	}
 
-	m, cmds := state.Update(msg)
-	main.models[main.state] = m
+	main.models[main.state], cmd = state.Update(msg)
+	cmds = append(cmds, cmd)
 
-	return main, cmds
+	return main, tea.Batch(cmds...)
 }
 
 func (main Main) View() string {
