@@ -206,7 +206,7 @@ func (config *Config) String() string {
 }
 
 func FromPath(path string) (*Config, error) {
-	file, err := os.OpenFile(path, os.O_RDWR, 0644)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_SYNC, 0644)
 	if err != nil {
 		return nil, err
 	}
