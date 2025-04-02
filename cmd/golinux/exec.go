@@ -69,3 +69,16 @@ func (exec *Exec) Init() tea.Cmd {
 	return nil
 }
 
+
+func (exec *Exec) header() string {
+	title := exec.Styles.Title.Render("Building kernel")
+	line := strings.Repeat("─", max(0, exec.viewport.Width-lipgloss.Width(title)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, title, line)
+}
+
+func (exec *Exec) footer() string {
+	info := exec.Styles.Info.Render(fmt.Sprintf("%3.f%%", exec.viewport.ScrollPercent()*100))
+	line := strings.Repeat("─", max(0, exec.viewport.Width-lipgloss.Width(info)))
+	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
+}
+
