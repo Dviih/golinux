@@ -90,3 +90,7 @@ func (exec *Exec) footer() string {
 	return lipgloss.JoinHorizontal(lipgloss.Center, line, info)
 }
 
+func (exec *Exec) Writer() io.Writer {
+	return &Writer{program: exec.program}
+}
+
