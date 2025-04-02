@@ -35,4 +35,10 @@ func main() {
 	flag.Parse()
 
 	util.SetWD(wd)
+
+	c, err := config.FromPath(util.WD("golinux.yaml"))
+	if err != nil {
+		panic(err)
+	}
+
 }
