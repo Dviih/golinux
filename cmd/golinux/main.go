@@ -160,6 +160,15 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			return main, nil
 		case key.Matches(msg, main.bindings.Sync):
+			if main.configAreaActive {
+				if err := yaml.Unmarshal([]byte(main.configArea.Value()), &main.config); err != nil {
+					panic(err)
+				}
+			}
+
+			if err := main.config.Sync(); err != nil {
+				panic(err)
+			}
 		case key.Matches(msg, main.bindings.Quit):
 			if main.help.ShowAll {
 				main.help.ShowAll = false
