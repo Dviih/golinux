@@ -245,3 +245,30 @@ func NewMain(config *config.Config) Main {
 	}
 }
 
+func toString(value reflect.Value) string {
+	switch value.Kind() {
+	case reflect.Invalid:
+		return "<nil>"
+	case reflect.Bool:
+		if value.Bool() {
+			return "true"
+		}
+
+		return "false"
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return strconv.FormatInt(value.Int(), 10)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return strconv.FormatUint(value.Uint(), 10)
+	case reflect.Uintptr, reflect.Array, reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice, reflect.Struct, reflect.UnsafePointer:
+		return fmt.Sprintf("%s", value)
+	case reflect.Float32, reflect.Float64:
+		return strconv.FormatFloat(value.Float(), 'g', -1, 64)
+	case reflect.Complex64, reflect.Complex128:
+		return strconv.FormatComplex(value.Complex(), 'g', -1, 128)
+	case reflect.String:
+		return value.String()
+	default:
+		panic("invalid value")
+	}
+}
+
