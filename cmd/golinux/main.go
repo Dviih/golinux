@@ -74,3 +74,17 @@ var helpMap = &HelpMap{
 	Execute: key.NewBinding(key.WithKeys(tea.KeyCtrlE.String()), key.WithHelp("control + e(execute)", "execute a package")),
 }
 
+type Main struct {
+	state  State
+	models map[State]tea.Model
+	config *config.Config
+
+	bindings *HelpMap
+	help     help.Model
+	exec     *Exec
+	style    lipgloss.Style
+
+	size  tea.WindowSizeMsg
+	focus bool
+}
+
