@@ -27,6 +27,7 @@ import (
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"gopkg.in/yaml.v3"
 	"reflect"
 	"strconv"
 )
@@ -108,6 +109,15 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds []tea.Cmd
 	)
 
+	if main.configAreaActive {
+		if !main.configArea.Focused() {
+			cmds = append(cmds, main.configArea.Focus())
+		}
+
+		main.configArea, cmd = main.configArea.Update(msg)
+		cmds = append(cmds, cmd)
+	}
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		main.size = msg
@@ -131,6 +141,24 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			main.help.ShowAll = true
 			main.focus = true
 		case key.Matches(msg, main.bindings.Config):
+			if main.configAreaActive {
+				return main, nil
+			}
+
+			main.configAreaActive = true
+			main.configArea.CharLimit = 1 << 32
+
+			main.configArea.SetWidth(main.size.Width - 10)
+			main.configArea.SetHeight(main.size.Height - 8)
+
+			data, err := yaml.Marshal(main.config)
+			if err != nil {
+				panic(err)
+			}
+
+			main.configArea.SetValue(string(data))
+
+			return main, nil
 		case key.Matches(msg, main.bindings.Sync):
 		case key.Matches(msg, main.bindings.Quit):
 			if main.help.ShowAll {
