@@ -183,3 +183,54 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return main, cmds
 }
 
+func (main Main) View() string {
+	style := lipgloss.NewStyle().
+		Padding(1).
+		Border(lipgloss.RoundedBorder()).
+		AlignVertical(lipgloss.Left).
+		AlignHorizontal(lipgloss.Center)
+
+	if main.help.ShowAll {
+		return style.AlignVertical(lipgloss.Center).Height(main.size.Height - 2).Width(main.size.Width - 2).Render(main.help.View(main.bindings))
+	}
+
+	if main.exec != nil {
+		if !main.exec.hasSelected {
+			view := style.UnsetBorderStyle().AlignVertical(lipgloss.Top).Render(main.exec.View()) + "\n" + "Golinux Alpha | Loaded Project: " + main.config.Project + "\n" + main.help.View(main.bindings)
+			return style.Height(main.size.Height - 2).Width(main.size.Width - 2).Render(view)
+		}
+
+		return style.Height(main.size.Height - 2).Width(main.size.Width - 2).Render(main.exec.View() + "\n" + "Golinux Alpha | Loaded Project: " + main.config.Project + "\n" + main.help.View(main.bindings))
+	}
+
+	if main.focus {
+		model, ok := main.models[main.state]
+		if !ok {
+			return "model not found"
+		}
+
+		view := style.UnsetBorderStyle().AlignVertical(lipgloss.Top).Render(model.View()) + "\n" + "Golinux Alpha | Loaded Project: " + main.config.Project + "\n" + main.help.View(main.bindings)
+		return style.Height(main.size.Height - 2).Width(main.size.Width - 2).Render(view)
+	}
+
+	var views []string
+
+	for state := State(0); state <= StateLast; state++ {
+		model, ok := main.models[state]
+		if !ok {
+			continue
+		}
+
+		style := style
+
+		if state == main.state {
+			style = style.BorderForeground(lipgloss.Color("#3C3C3C"))
+		}
+
+		views = append(views, style.Height(main.size.Height-8).Width(main.size.Width/(len(main.models)+1)).Render(model.View()))
+	}
+
+	view := lipgloss.JoinHorizontal(lipgloss.Top, views...) + "\n" + "Golinux Alpha | Loaded Project: " + main.config.Project + "\n" + main.help.View(main.bindings)
+	return style.Height(main.size.Height - 2).Width(main.size.Width - 2).Render(view)
+}
+
