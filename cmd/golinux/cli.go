@@ -26,3 +26,12 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+var (
+	wd string
+)
+
+func main() {
+	flag.StringVar(&wd, "wd", "", "The path to the working directory")
+	flag.Parse()
+
+}
