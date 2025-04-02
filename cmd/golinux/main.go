@@ -30,3 +30,13 @@ import (
 	"strconv"
 )
 
+type State int
+
+const (
+	StateCompilers State = iota
+	StateKernels
+	StatePackages
+	StateRunners
+	StateLast
+)
+
