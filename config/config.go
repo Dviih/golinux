@@ -27,6 +27,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"sync"
 )
 
 type KV struct {
@@ -62,6 +63,7 @@ func (kv *KV) MarshalYAML() (interface{}, error) {
 }
 
 type Config struct {
+	m    sync.Mutex
 	file fs.File `yaml:"-"`
 
 	Project   string               `yaml:"project"`
@@ -75,6 +77,10 @@ type Config struct {
 }
 
 func (config *Config) Sync() error {
+	if file, ok := config.file.(*os.File); ok {
+		return config.syncFile(file)
+	}
+
 	seeker, ok := config.file.(io.Seeker)
 	if !ok {
 		return errors.New("unsupported: missing io.Seeker")
@@ -90,6 +96,25 @@ func (config *Config) Sync() error {
 	}
 
 	return yaml.NewEncoder(writer).Encode(config)
+}
+
+func (config *Config) syncFile(file *os.File) error {
+	defer config.m.Unlock()
+	config.m.Lock()
+
+	if _, err := file.Seek(0, io.SeekStart); err != nil {
+		return err
+	}
+
+	if err := file.Truncate(0); err != nil {
+		return err
+	}
+
+	if err := yaml.NewEncoder(file).Encode(config); err != nil {
+		return err
+	}
+
+	return file.Sync()
 }
 
 func (config *Config) Close() error {
@@ -182,7 +207,7 @@ func (config *Config) String() string {
 }
 
 func FromPath(path string) (*Config, error) {
-	file, err := os.OpenFile(path, os.O_RDWR, 0644)
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_SYNC, 0644)
 	if err != nil {
 		return nil, err
 	}
