@@ -173,14 +173,28 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if main.help.ShowAll {
 				main.help.ShowAll = false
 				main.focus = false
+
+				return main, nil
+			}
+
+			if main.configAreaActive {
+				main.configAreaActive = false
 				return main, nil
 			}
 
 			return main, tea.Quit
 		case key.Matches(msg, main.bindings.Zoom):
+			if main.configAreaActive {
+				break
+			}
+
 			main.focus = !main.focus
 			return main, nil
 		case key.Matches(msg, main.bindings.Build):
+			if main.configAreaActive {
+				break
+			}
+
 			if main.exec != nil {
 				if main.exec.done {
 					main.exec = nil
@@ -210,6 +224,9 @@ func (main Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 
+	if main.configAreaActive {
+		return main, tea.Batch(cmds...)
+	}
 
 	if main.exec != nil {
 		main.exec, cmd = main.exec.Update(msg)
