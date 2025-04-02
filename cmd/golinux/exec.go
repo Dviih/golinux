@@ -94,3 +94,21 @@ func (exec *Exec) Writer() io.Writer {
 	return &Writer{program: exec.program}
 }
 
+func NewExec(options []string) *Exec {
+	exec := &Exec{
+		options: options,
+	}
+
+	styles := list.DefaultStyles()
+
+	br := lipgloss.RoundedBorder()
+	br.Right = "├"
+
+	bl := lipgloss.RoundedBorder()
+	bl.Left = "┤"
+
+	exec.Styles.Title = styles.Title.BorderStyle(br).Padding(0, 1)
+	exec.Styles.Info = lipgloss.NewStyle().BorderStyle(bl)
+
+	return exec
+}
