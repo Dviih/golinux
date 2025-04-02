@@ -70,6 +70,14 @@ func (exec *Exec) Init() tea.Cmd {
 }
 
 
+func (exec *Exec) View() string {
+	if !exec.hasSelected {
+		return exec.selectList.View()
+	}
+
+	return exec.header() + "\n" + exec.viewport.View() + "\n" + exec.footer()
+}
+
 func (exec *Exec) header() string {
 	title := exec.Styles.Title.Render("Building kernel")
 	line := strings.Repeat("─", max(0, exec.viewport.Width-lipgloss.Width(title)))
