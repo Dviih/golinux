@@ -272,3 +272,61 @@ func toString(value reflect.Value) string {
 	}
 }
 
+func setValue(value reflect.Value, s string) {
+	if !value.CanSet() {
+		return
+	}
+
+	switch value.Kind() {
+	case reflect.Invalid:
+		return
+	case reflect.Bool:
+		if s == "true" {
+			value.SetBool(true)
+			return
+		}
+
+		value.SetBool(false)
+		return
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		i, err := strconv.ParseInt(s, 10, value.Type().Bits())
+		if err != nil {
+			panic(err)
+		}
+
+		value.SetInt(i)
+		return
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		u, err := strconv.ParseUint(s, 10, value.Type().Bits())
+		if err != nil {
+			panic(err)
+		}
+
+		value.SetUint(u)
+		return
+	case reflect.Uintptr, reflect.Array, reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Pointer, reflect.Slice, reflect.Struct, reflect.UnsafePointer:
+		return // can't set
+	case reflect.Float32, reflect.Float64:
+		f, err := strconv.ParseFloat(s, value.Type().Bits())
+		if err != nil {
+			panic(err)
+		}
+
+		value.SetFloat(f)
+		return
+	case reflect.Complex64, reflect.Complex128:
+		c, err := strconv.ParseComplex(s, value.Type().Bits())
+		if err != nil {
+			panic(err)
+		}
+
+		value.SetComplex(c)
+		return
+	case reflect.String:
+		value.SetString(s)
+		return
+	default:
+		panic("invalid value")
+	}
+}
+
